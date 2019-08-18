@@ -46,7 +46,7 @@ together with:
 
 ### 2. Running the models
 
-After installing *fert1.ado* in the appropriate directory, the syntax to run the models is 
+After installing *fert1.ado* in the appropriate directory, the syntax to run the models is
 ```
 fert1 "path1" "path2"
 ```
@@ -62,28 +62,25 @@ The other do files are described in [4] below.
 
 ### 3. Production of output
 
-The principal output of the model is in the form of a very large *Excel* workbook (*outputdata.xlsx*). There is one sheet per country, labelled with the DHS digraph for that country, containing the current modelled betas (coefficients) and their associated p-values from each of the two regressions performed.
+The principal output of the model is in the form of a very large *Excel* workbook (*outputdata.xlsx*). There is one sheet per country, labelled with the DHS digraph for that country, containing the current modelled betas (coefficients) and their associated *p*-values from each of the two regressions performed.
 
-These coefficients are then aggregated into four sheets, containing all coefficients and p-values for each country, from both regression models. These sheets are labelled:
+These coefficients are then aggregated into four sheets, containing all coefficients and *p*-values for each country, from both regression models. These sheets are labelled:
 
 - GM Coefficients: the general model betas
-- GM pvalues: the general model p-values,
+- GM pvalues: the general model *p*-values,
 - 1b Coefficients: the first birth model betas
-- 1b pvalues: the first birth model p-values
+- 1b pvalues: the first birth model *p*-values
 
-Output for a specific country, including figures equivalent to thise in Fig. 2 of the paperscan be obtained in the Fitted Result sheet by changing the country digraph in the dropdown box in cell C1. A data table, beginning at Cell B158 on this sheet contains all results for all countries, and is populated by means of recalculation.
+Output for a specific country, including figures equivalent to those in Fig. 2 of the paper can be obtained in the 'Fitted results' sheet by changing the country digraph in the dropdown box in cell C1. A data table, beginning at Cell B158 on this sheet contains all results for all countries, and is populated by means of recalculation.
 
-The Digraphs and TFRs sheet contains a list of digraphs, country names, as well as the series of TFRs from 1950-55 through to 2010-15 as derived from the UN Population Division's *[World Population Prospects](https://population.un.org/wpp/)* (currently using the 2017 edition). For new releases of the *WPP*, or when new countries are added to the model, the data in columns F:S of this sheet must be updated. After running *mediandates.do*, a window pops up in *Stata* requiring that *outputdata.xlsx* is opened, to allow certain data tables to be updated. Once the file has opened, press F9 to recalculate the sheet (it takes some time!), and resave it, with the same name in the same location. Having done that, click on "OK" on the popup window to allow processing of the data to proceed.
+The 'Digraphs and TFRs' sheet contains a list of digraphs, country names, as well as the series of TFRs from 1950-55 through to 2010-15 as derived from the UN Population Division's *[World Population Prospects](https://population.un.org/wpp/)* (currently using the 2017 edition). For new releases of the *WPP*, or when new countries are added to the model, the data in columns F:S of this sheet must be updated. After running *mediandates.do*, a window pops up in *Stata* requiring that *outputdata.xlsx* is opened, to allow certain data tables to be updated. Once the file has opened, press F9 to recalculate the sheet (it takes some time!), and resave it, with the same name in the same location. Having done that, click on "OK" on the popup window to allow processing of the data to proceed.
 
 ### 4. Production of tables and figures
 
 The *mediandates.do* file simply records from the median date of each survey in each country, the median earliest and latest dates of the surveys conducted in each country. The output is stored in the `/003tempmediandates directory`, with output being written to an *Excel* file.
 
-*excel_to_stata_graphs.do* reads in the contents of the *Data_Inventory.xlsx file* - a master list (useful for record keeping purposes) of exactly which files are contained in `c:\ ... \000DHS FL Files`. This workbook also holds the master list of regions and subregions. Edits and changes made here will govern the allocation of countries to regions and subregions in all the subsequent analysis. The do file then reads in the Data for Stata graphs sheet of *outputdata.xlsx*, and merges this with the data on the earliest and latest median survey dates. The output data are reshaped to produce one record per country-quinquennium. Minor adjustments are made to the final data before it is saved as *graphdata4.dta*.
+*excel_to_stata_graphs.do* reads in the contents of the *Data_Inventory.xlsx file* - a master list (useful for record keeping purposes) of exactly which files are contained in `c:\ ... \000DHS FL Files`. This workbook also holds the master list of regions and subregions. Edits and changes made here will govern the allocation of countries to regions and subregions in all the subsequent analysis. The do file then reads in the 'Data for Stata graphs' sheet of *outputdata.xlsx*, and merges this with the data on the earliest and latest median survey dates. The output data are reshaped to produce one record per country-quinquennium. Minor adjustments are made to the final data before they are saved as *graphdata4.dta*.
 
-*parity_nomore.do* computes the proportions of not-declared-infecund married women who gave birth in the 12 months preceding each survey who respond that they want no more children. The resulting dataset (paritynomore) is stored as a sheet in *outputdata.xlsx* and used to produce Figure 3 and A4.
+*parity_nomore.do* computes the proportions of not-declared-infecund married women who gave birth in the 12 months preceding each survey who respond that they want no more children. The resulting dataset (paritynomore) is stored in the 'NoMore by parity' sheet in *outputdata.xlsx* and used to produce Figures 3 and A4.
 
-The production of all figures included in the paper are automated in two do files, *final_graphs.do* and *choropleth8.do*. The former file produces all figures, other than maps, as well as Table 2, the listing of diagnostics used to classify countries. The latter file uses *[NaturalEarth](https://www.naturalearthdata.com/)* 4.1.1 shapefiles to prepare the maps.
-
-
-
+The production of all figures included in the paper, including the web appendix, is automated in two do files, *final_graphs.do* and *choropleth8.do*. The former file produces all figures, other than maps, as well as Table 2, the listing of diagnostics used to classify countries. It also writes out an working file *choropleth8.dta*. In the final step of the analysis, *choropleth8.do* uses the the latter file and *[NaturalEarth](https://www.naturalearthdata.com/)* 4.1.1 shapefiles to prepare the maps.
