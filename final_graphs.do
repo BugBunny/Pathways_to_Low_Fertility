@@ -1,17 +1,21 @@
 *
-* Produces the figures for the Pathways to Low Fertility paper, together with
+* Produces figures for the Pathways to Low Fertility paper, together with
 * the summary indices of the pattern of fertility change presented in Table A2
 *
 * Ian Timaeus and Tom Moultrie
 *
-* Last edited: 2019-2-25
+* Last edited: 2019-11-22
 *
 * All these figures except Figure A4 use the graphdata4.dta file as input. This
 * is created from the outputdata.xlsx sheet by excel_to_stata_graphs.do. Figure
-* A.4 uses paritynomore.dta, which is produced by parity_nomore.do. Figure 2 is
-* produced within outputdata.xlsx; Figure 8 is produced by choropleth8.do
+* A.4 uses paritynomore.dta, which is produced by parity_nomore.do. Figure 3 is
+* produced In Excel from outputdata.xlsx; Figure 7 is produced by choropleth8.do
+* and finalised in Inkscape.
 *
-* The graphs are largely formatted using the grstyle package
+* The graphs are largely formatted using the grstyle package.
+*
+* The graphs for publication are exported as pdf's. The graphs can also be cut
+* and pasted into Word as Windows EMFs or exported as png's for web use.
 *
 * (To suppress the figures and only produce Table A2, type global drawgraphs 0 
 * at the command prompt before running fert1.ado / final_graphs.do)
@@ -25,6 +29,7 @@ scalar s_drawgraphs = strpos("$drawgraphs","0")~=1
 *
 * Use grstyle package to set up the appearance of the figures
 *
+graph set window fontface garamond
 set scheme s2color
 grstyle clear, erase
 grstyle init
@@ -38,32 +43,31 @@ grstyle set color teal: p2markline
 grstyle set color emerald: p3markline
 grstyle set symbol O D S T Th
 grstyle anglestyle p5symbol 180
-
 use "..\graphdata4.dta", clear
 drop if full_mod_tfr==.
 
-* Figure 1 - Comparison with UNPDs estimates of the TFR
+* Figure 2 - Comparison with UNPDs estimates of the TFR
 if s_drawgraphs {
 	#delimit ;
 	twoway (scatter full_mod_tfr un_tfr if region=="Africa",
 		  legend(label(1 "Sub-Saharan Africa")))
 		(scatter full_mod_tfr un_tfr if region=="ex_USSR",
-		  legend(label(2 "Europe & ex-USSR") size(small)))
+		  legend(label(2 "Europe and former USSR") size(small)))
 		(scatter full_mod_tfr un_tfr if region=="LatAm",
 		  legend(label(3 "Latin America")))
 		(scatter full_mod_tfr un_tfr if region=="MENA",
-		  legend(label(4 "Middle-East & N. Africa")))
+		  legend(label(4 "Middle East and North Africa")))
 		(scatter full_mod_tfr un_tfr if region=="S&EAsia",
-		  legend(label(5 "South & South-East Asia")))
-		(line full_mod_tfr full_mod_tfr, lcolor(black)), legend(order(1 2 3 4 5)
-		  rows(2) region(lstyle(none))) xtitle("UN TFR")
-		  ytitle("Estimated TFR") ;
+		  legend(label(5 "South and Southeast Asia")))
+		(line full_mod_tfr full_mod_tfr, lcolor(black)),
+		legend(order(1 2 3 4 5) rows(2) region(lstyle(none)))
+		xtitle("{bf:Total Fertility – United Nations Estimates}")
+		ytitle("{bf:Parity-Age-Duration–Adjusted Total Fertility}") ;
 	#delimit cr
-	graph save fig1, replace
+	gr export "fig2.pdf", replace
 }
 * Drop 2 outlying sets of observations (Benin and Guatemala)
 drop if drop
-
 * Reductions in PPRs by order & Figure 4a
 gen p0123 = full_ppr_0*full_ppr_1*full_ppr_2*full_ppr_3
 gen p4567 = full_ppr_4*full_ppr_5*full_ppr_6*full_ppr_7
@@ -84,23 +88,19 @@ label val p_indic pi
 drop min? max? last?
 if s_drawgraphs {
 	#delimit ;
-	twoway  scatter reduc7 reduc3 if region=="Africa",
-			   legend(label(1 "Sub-Saharan Africa")) ||
-			scatter reduc7 reduc3 if region=="ex_USSR",
-			  legend(label(2 "Europe & ex-USSR")) ||
-			scatter reduc7 reduc3 if region=="LatAm",
-			  legend(label(3 "Latin America")) ||
-			scatter reduc7 reduc3 if region=="MENA",
-			   legend(label(4 "Middle-East & N. Africa")) ||
-			scatter reduc7 reduc3 if region=="S&EAsia",
-			   legend(label(5 "South & South-East Asia")) ||
-			function y=x+.1, range(0 .7) lcolor(black) lpattern(dash) ||
-			function y=x-.1, range(.1 .8) lcolor(black) lpattern(dash)|| ,
-			  legend(order(1 2 3 4 5) rows(2)) ylabel(0(.2).8)
-			  xtitle("Reduction in progression to 4th birth")
-			  ytitle("Reduction in progression from 4th to 8th birth");
+	twoway  scatter reduc7 reduc3 if region=="Africa" ||
+		scatter reduc7 reduc3 if region=="ex_USSR" ||
+		scatter reduc7 reduc3 if region=="LatAm" ||
+		scatter reduc7 reduc3 if region=="MENA" ||
+		scatter reduc7 reduc3 if region=="S&EAsia" ||
+		function y=x+.1, range(0 .7) lcolor(black) lpattern(dash) ||
+		function y=x-.1, range(.1 .8) lcolor(black) lpattern(dash)|| ,
+		  legend(off) ylabel(0(.2).8)
+		xtitle("{bf:Reduction in Progression to the 4th Birth}")
+		ytitle("{bf:Reduction in Progression from 4 to 8 Births}")
+		title({bf:a. Reduction over Time in Progression across Higher and Lower Birth Orders},
+		pos(11) size(medsmall))	name(fig4a, replace);
 	#delimit cr
-graph save fig4a, replace
 }
 * Concavity & Figure 4b
 gen work1 = full_ppr_4/2 + (full_ppr_5+full_ppr_3)/4
@@ -116,24 +116,42 @@ label val concavity concav
 drop work? concave
 if s_drawgraphs {
 	#delimit ;
+	twoway  scatter slope8 slope4 if region=="Africa" ||
+		scatter slope8 slope4 if region=="ex_USSR" ||
+		scatter slope8 slope4 if region=="LatAm" ||
+		scatter slope8 slope4 if region=="MENA" ||
+		scatter slope8 slope4 if region=="S&EAsia" ||
+		function y=x, range(0 .4) lcolor(black) lpattern(dash) ||
+		function y=x/3, range(0 0.7) lcolor(black) lpattern(dash)||
+		if country~=country[_n+1], legend(off) ylabel(-.4(.2).4)
+		xtitle({bf:Difference Between PPR{sub:0} and PPR{sub:4}})
+		ytitle({bf:Difference Between PPR{sub:4} and PPR{sub:8}})
+		title({bf:b. Recent Differences in Progression across Higher and Lower Birth Orders},
+		pos(11) size(medsmall))	name(fig4b, replace);
+* This third graph incorporates the legend
+	#delimit ;
 	twoway  scatter slope8 slope4 if region=="Africa",
-			   legend(label(1 "Sub-Saharan Africa")) ||
-			scatter slope8 slope4 if region=="ex_USSR",
-			  legend(label(2 "Europe & ex-USSR")) ||
-			scatter slope8 slope4 if region=="LatAm",
-			  legend(label(3 "Latin America")) ||
-			scatter slope8 slope4 if region=="MENA",
-			   legend(label(4 "Middle-East & N. Africa")) ||
-			scatter slope8 slope4 if region=="S&EAsia",
-			   legend(label(5 "South & South-East Asia")) ||
-			function y=x, range(0 .4) lcolor(black) lpattern(dash) ||
-			function y=x/3, range(0 0.7) lcolor(black) lpattern(dash)||
-			if country~=country[_n+1],
-			legend(order(1 2 3 4 5) rows(2)) ylabel(-.4(.2).4)
-			xtitle("Difference between PPR{sub:0} and PPR{sub:4}")
-			ytitle("Difference between PPR{sub:4} and PPR{sub:8}");
+		   legend(label(1 "Sub-Saharan Africa")) ||
+		scatter slope8 slope4 if region=="ex_USSR",
+		  legend(label(2 "Europe and former USSR")) ||
+		scatter slope8 slope4 if region=="LatAm",
+		  legend(label(3 "Latin America")) ||
+		scatter slope8 slope4 if region=="MENA",
+		   legend(label(4 "Middle East and North Africa")) ||
+		scatter slope8 slope4 if region=="S&EAsia",
+		   legend(label(5 "South and Southeast Asia")) ||
+		if country~=country[_n+1], yscale(off) xscale(off)
+		legend(order(1 2 3 4 5) rows(2)) name(lg, replace);
 	#delimit cr
-graph save fig4b, replace
+* Turn off drawing the plotregion
+_gm_edit .lg.plotregion1.draw_view.set_false
+* Stop combine expanding the legend's height to match the other graphs
+_gm_edit .lg.ystretch.set fixed
+grstyle set graphsize 24cm 17cm
+graph combine fig4a fig4b lg, cols(1)
+gr export "fig4.pdf", replace
+grstyle set graphsize 17cm 24cm
+graph drop fig4a fig4b leggraph
 }
 * Reduction in TFR
 by country: egen maxtfr = max(full_mod_tfr)
@@ -179,26 +197,21 @@ label val swivel60b60 swiv
 drop firstq60 lastq60
 if s_drawgraphs {
 	#delimit ;
-	twoway (scatter reducq60 reducb60 if region=="Africa",
-			  legend(label(1 "Sub-Saharan Africa")))
-		(scatter reducq60 reducb60 if region=="ex_USSR",
-			  legend(label(2 "Europe & ex-USSR")))
-		(scatter reducq60 reducb60 if region=="LatAm",
-			legend(label(3 "Latin America")))
-		(scatter reducq60 reducb60 if region=="MENA",
-			  legend(label(4 "Middle-East & N. Africa")))
-		(scatter reducq60 reducb60 if region=="S&EAsia",
-			  legend(label(5 "South & South-East Asia")))
+	twoway (scatter reducq60 reducb60 if region=="Africa")
+		(scatter reducq60 reducb60 if region=="ex_USSR")
+		(scatter reducq60 reducb60 if region=="LatAm")
+		(scatter reducq60 reducb60 if region=="MENA")
+		(scatter reducq60 reducb60 if region=="S&EAsia")
 		(function y = _b[_cons]+.01+_b[reducb60]*x, range(-.1 .45) lcolor(black)
 			lpattern(dash))
 		(function y = _b[_cons]-.05+_b[reducb60]*x, range(-.1 .45) lcolor(black)
 			lpatt(dash))
 		if country~=country[_n+1],
-		xlab(-.1(.1).4) xtitle("Reduction in B(60)")
-		ytitle(Reduction in {subscript:60}{it:b}{subscript:60})
-		legend(order(1 2 3 4 5) rows(2));
+		xlab(-.1(.1).4) xtitle("{bf:Drop in progression within 60 months, {it:B}(60)}")
+		ytitle("{bf:Drop in progression at 60–120 months, {sub:60}{it:b}{sub:60}}")
+		title("{bf:a. Reduction in progression at long durations, compared with shorter durations}",
+		pos(11) size(medsmall)) legend(off) name(fig6a, replace);
 	#delimit cr
-	graph save fig6a, replace
 }
 * Spacing (reductions in B(30) and 30b30) and Figure 6b
 gen B30 = exp(-.75*full_m_9)*exp(-.5* full_m_18)*exp(-.5* full_m_24)
@@ -213,25 +226,44 @@ gen spacing = cond(rightshift>0.125, "Large drop", /*
 drop B30 firstB30 lastB30 firstb60 lastb60
 if s_drawgraphs {
 	#delimit ;
-	twoway (scatter reducB30 reduc30b30 if region=="Africa",
-			legend(label(1 "Sub-Saharan Africa")))
-		(scatter reducB30 reduc30b30 if region=="ex_USSR",
-			legend(label(2 "Europe & ex-USSR")))
-		(scatter reducB30 reduc30b30 if region=="LatAm",
-			legend(label(3 "Latin America")))
-		(scatter reducB30 reduc30b30 if region=="MENA",
-			legend(label(4 "Middle-East & N. Africa")))
-		(scatter reducB30 reduc30b30 if region=="S&EAsia",
-			legend(label(5 "South & South-East Asia")))
+	twoway (scatter reducB30 reduc30b30 if region=="Africa")
+		(scatter reducB30 reduc30b30 if region=="ex_USSR")
+		(scatter reducB30 reduc30b30 if region=="LatAm")
+		(scatter reducB30 reduc30b30 if region=="MENA")
+		(scatter reducB30 reduc30b30 if region=="S&EAsia")
 		(function y = _b[_cons] + 0.125 + _b[reduc30b30]*x, range(-.15 .35)
 			lcolor(black) lpatt(dash))
 		(function y = _b[_cons]+_b[reduc30b30]*x, range(-.15 .35) lcolor(black)
 			lpatt(shortdash)) if country~=country[_n+1], ylabel(-.2(.2).4)
-		xlab(-.1(.1).3) xtitle(Reduction in {sub:30}{it:b}{sub:30})
-		ytitle("Reduction in B(30)")
-		legend(order(1 2 3 4 5) rows(2));
+		xlab(-.1(.1).3) 
+		xtitle("{bf:Drop in progression at 30–60 months, {sub:30}{it:b}{sub:30}}")
+		ytitle("{bf:Drop in progression within 30 months, {it:B}(30)}") 
+		legend(off) name(fig6b, replace)
+		title("{bf:b. Reduction in progression at short durations, compared with intermediate durations}",
+		pos(11) size(medsmall));
+	#delimit ;		
+	twoway (scatter reducB30 reduc30b30 if region=="Africa",
+			legend(label(1 "Sub-Saharan Africa")))
+		(scatter reducB30 reduc30b30 if region=="ex_USSR",
+			legend(label(2 "Europe and former USSR")))
+		(scatter reducB30 reduc30b30 if region=="LatAm",
+			legend(label(3 "Latin America")))
+		(scatter reducB30 reduc30b30 if region=="MENA",
+			legend(label(4 "Middle East and North Africa")))
+		(scatter reducB30 reduc30b30 if region=="S&EAsia",
+			legend(label(5 "South and Southeast Asia"))),
+		legend(order(1 2 3 4 5) rows(2)) 
+		xscale(off) yscale(off) name(lg, replace);
 	#delimit cr
-	graph save fig6b, replace
+* Turn off drawing the plotregion
+_gm_edit .lg.plotregion1.draw_view.set_false
+* Stop combine expanding the legend's height to match the other graphs
+_gm_edit .lg.ystretch.set fixed
+grstyle set graphsize 24cm 17cm
+graph combine fig6a fig6b lg, cols(1)
+gr export "fig6.pdf", replace
+grstyle set graphsize 17cm 24cm
+graph drop fig6a fig6b lg
 }
 * Generate classification of countries from summary indices
 drop if country==country[_n-1]
@@ -275,14 +307,14 @@ keep digraph region subregion country classification NAME
 rename digraph DHS_digraph
 sort NAME
 preserve
-	*cd "C:/Users/ecpsitim/temp/"
-	cd "${working_dir}004GIS_data/"
+	*cd "C:/Users/ecpsitim/temp/
+	cd "${working_dir}004GIS/"
 	use "ne_50m_admin_data.dta", clear
 	keep _ID NAME REGION_UN REGION_WB ISO_A2
 	sort NAME
 	tempfile admindata
 	save `admindata'
-*	cd C:/Users/ecpsitim/Documents/git/Stata/Pathways_to_Low_Fertility_Private/
+	*cd C:/Users/ecpsitim/Documents/git/Stata/Pathways_to_Low_Fertility_Private/
 	cd "${project_dir}001Figures/"
 restore
 merge 1:1 NAME using `admindata'
@@ -293,7 +325,6 @@ save "..\choropleth8.dta", replace
 
 if s_drawgraphs {
 * Figure 5 - Median closed intervals against TFR
-
 * Store a numeric list of regions in a matrix in alphabetical order of country
 capture matrix drop R
 use ../digraphs, clear
@@ -331,15 +362,16 @@ foreach place in `ctry' {
 	local gr `"`gr' (line full_cmed_all full_mod_tfr if country=="`place'" "'
 	local gr `"`gr' & full_mod_tfr<9, lcolor("`cstyle'") "'
 	local gr `"`gr' lwidth("medthick") legend(on rows(2)) lpattern(`ls')) "'
-
 }
-twoway `gr', ylab(24(12)60)  ///
-	ytitle("Median closed interval (months)") xscale(rev) xlab(2(2)8) ///
-	xtitle("Parity-age-duration adjusted total fertility") ///
-	legend(order(`a' "Sub-Saharan Africa" `e' "Europe & ex-USSR" ///
-	`l' "Latin America" `m' "Middle-East & N. Africa" ///
-	`s' "South & South-East Asia"))
-graph save fig5, replace
+#delimit ;
+twoway `gr', ylab(24(12)60)  
+	ytitle("{bf:Median Closed Interval (months)}") xscale(rev) xlab(2(2)8) 
+	xtitle("{bf:Parity-Age-Duration–Adjusted Total Fertility}") 
+	legend(order(`a' "Sub-Saharan Africa" `e' "Europe and former USSR" 
+	`l' "Latin America" `m' "Middle East and North Africa" 
+	`s' "South and Southeast Asia"))
+#delimit cr
+gr export "fig5.pdf", replace
 
 * Convert to one record per quinquennium for Appendix figures A1 and A2
 egen id = group(country year)
@@ -349,6 +381,11 @@ rename full_ppr_ full_ppr
 rename full_b60_ full_b60
 rename full_q60_ full_q60
 rename full_cmed_ full_cmed
+replace country = "Central African Republic" if country=="Central African Rep."
+replace country = "Kyrgyz Republic" if country=="Kyrgyz Rep."
+replace country = "Dominican Republic" if country=="Dominican Rep."
+replace country = "Congo (Democratic Rep.)" if country=="Congo (Dem. Rep.)"
+replace country = "Congo (Republic)" if country=="Congo"
 * Reinitialise graph style
 grstyle set graphsize 21cm 29.7cm
 grstyle set color hcl, viridis n(7)
@@ -364,14 +401,15 @@ twoway (line full_ppr order if year==1967.5 ||
 	line full_ppr order if year==1997.5 ||
 	line full_ppr order if year==2007.5 ||
 	line full_ppr order if year==2012.5) if order<=9,
-	subtitle(, fcolor(ltkhaki) lcolor(black) size(small)) by(country,
-	iscale(*1.2) imargin(small) note("") rows(8)
+	subtitle(, fcolor(ltkhaki) lcolor(black) size(*.667)) by(country,
+	iscale(*1.4) imargin(small) note("") rows(8)
 	legend(at(84) pos(0))) legend(`quinquenlab' order(1 2 3 4 5 6) 
-	rowgap(quarter_tiny) symxsize(10) size(large) cols(1))
-	ylab(0(0.2)1) ytitle("Parity progression ratio", margin(right))
-	xlab(0(1)9) xtitle("Parity", margin(top));
+	rowgap(quarter_tiny) symxsize(10) size(large) cols(1)) ylab(0(0.2)1) 
+	ytitle("{bf:Parity Progression Ratio}", margin(right) size(small))
+	xlab(0(1)9) xtitle("{bf:Parity}", margin(top) size(small));
 #delimit cr
 graph save "figA1", replace
+gr export "figA1.pdf", replace
 
 * Figure A2 - Median closed intervals
 local quinquenlab `"label(1 "1965-1969") label(2 "1975-1979")"'
@@ -384,17 +422,24 @@ twoway (line full_cmed order if year==1967.5 ||
 	line full_cmed order if year==1997.5 ||
 	line full_cmed order if year==2007.5 ||
 	line full_cmed order if year==2012.5) if order<=9,
-	subtitle(, fcolor(ltkhaki) lcolor(black) size(small)) by(country,
-	iscale(*1.2) imargin(small) note("") rows(8)
+	subtitle(, fcolor(ltkhaki) lcolor(black) size(*.667)) by(country,
+	iscale(*1.4) imargin(small) note("") rows(8)
 	legend(at(84) pos(0))) legend(`quinquenlab' order(1 2 3 4 5 6) 
 	rowgap(quarter_tiny)  symxsize(10) size(large) cols(1))
-	ylab(12(12)60) ytitle("Median closed birth interval (months)",
-	margin(right)) xlab(1(1)9) xtitle("Birth order", margin(top));
+	ylab(12(12)60) ytitle("{bf:Median Closed Birth Interval (months)}",
+	margin(right) size(small)) xlab(1(1)9) xtitle("{bf:Birth Order}", 
+	margin(top) size(small));
 	#delimit cr
 graph save "figA2", replace
+gr export "figA2.pdf", replace
 
 * Figure A3 - DSFRs: convert to one record per duration-segment
 use "../graphdata4.dta", clear
+replace country = "Central African Republic" if country=="Central African Rep."
+replace country = "Kyrgyz Republic" if country=="Kyrgyz Rep."
+replace country = "Dominican Republic" if country=="Dominican Rep."
+replace country = "Congo (Democratic Rep.)" if country=="Congo (Dem. Rep.)"
+replace country = "Congo (Republic)" if country=="Congo"
 drop if full_m_9==. | drop
 keep country-subregion full_m_*
 egen id = group(country year)
@@ -410,19 +455,25 @@ line full_m duration if year==1967.5
  	|| line full_m duration if year==1997.5
 	|| line full_m duration if year==2007.5
 	|| line full_m duration if year==2012.5,
-	subtitle(, fcolor(ltkhaki) lcolor(black) size(small)) by(country,
-	iscale(*1.2) imargin(small) note("") rows(8) legend(at(84) pos(0)))
+	subtitle(, fcolor(ltkhaki) lcolor(black) size(*.667)) by(country,
+	iscale(*1.4) imargin(small) note("") rows(8) legend(at(84) pos(0)))
 	legend(`quinquenlab' order(1 2 3 4 5 6) rowgap(quarter_tiny) symxsize(10)
-	size(large) cols(1)) ytitle("Fertility rate", margin(right)) ylab(0(0.2)1)
-	xlab(0(36)180, labsize(small)) xtitle("Interval duration (months)",
-	margin(top));
+	size(large) cols(1)) ylab(0(0.2)1) xlab(0(36)180, labsize(small)) 
+	ytitle("{bf:Fertility Rate}", margin(right) size(small)) 
+	xtitle("{bf:Interval Duration (months)}", margin(top) size(small));
 #delimit cr
 graph save "figA3", replace
+gr export "figA3.pdf", replace
 
 * Figure A4 - Women who want no more children by survey
 import excel using "../outputdata.xlsx", sheet("NoMore by parity") ///
 	firstrow clear
 merge m:1 digraph using "../digraphs.dta"
+replace country = "Central African Republic" if country=="Central African Rep."
+replace country = "Kyrgyz Republic" if country=="Kyrgyz Rep."
+replace country = "Dominican Republic" if country=="Dominican Rep."
+replace country = "Congo (Democratic Rep.)" if country=="Congo (Dem. Rep.)"
+replace country = "Congo (Republic)" if country=="Congo"
 drop if _merge!=3
 * Surveys are re-numbered from last to 1st to get fewer "hot" lines. The labels 
 * and their ordering are then "re-reversed" from 1st up.
@@ -438,15 +489,16 @@ twoway 	(line meannomore parity10 if surveyno==1 & n>=50)
 	(line meannomore parity10 if surveyno==7 & n>=50)
 	(line meannomore parity10 if surveyno==8 & n>=50)
 	(line meannomore parity10 if surveyno==9 & n>=50) if parity10<=9,
-	subtitle(, fcolor(ltkhaki) lcolor(black) size(small))
-	ytitle("Proportion wanting no more children", margin(right))
-	by(country, iscale(*1.2) imargin(small) note("") rows(8) legend(at(84)
-	pos(0))) ylab(0(0.2)1) xtitle("Parity", margin(top)) xlab(0(1)9)
-	legend(colfirst
-	label(1 "1st survey") label(2 "2nd survey") label(3 "3rd survey")
-	label(4 "4th survey") label(5 "5th survey") label(6 "6th survey")
-	label(7 "7th survey") label(8 "8th survey") label(9 "9th survey")
-	size(medium) rowgap(0.1) symxsize(8) cols(1));
+	subtitle(, fcolor(ltkhaki) lcolor(black) size(*.667))
+	by(country, iscale(*1.4) imargin(small) note("") rows(8) legend(at(84)
+	pos(0))) ylab(0(0.2)1) xtitle("{bf:Parity}", margin(top) size(small))
+	xlab(0(1)9)	ytitle("{bf:Proportion of Women Wanting No More Children}",
+	marg(right) size(small)) legend(colfirst label(1 "1st survey")
+	label(2 "2nd survey") label(3 "3rd survey")	label(4 "4th survey")
+	label(5 "5th survey") label(6 "6th survey")	label(7 "7th survey") 
+	label(8 "8th survey") label(9 "9th survey")	size(medium) rowgap(0.1) 
+	symxsize(8) cols(1));
 #delimit cr
 graph save "figA4", replace
+gr export "figA4.pdf", replace
 }
