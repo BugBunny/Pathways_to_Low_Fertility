@@ -1,5 +1,5 @@
 # Pathways to Low Fertility
-*Excel* sheets, *Stata* do files and other resources related to the article 'Pathways to Low Fertility: 50 Years of Limitation, Curtailment, and Postponement of Childbearing' by Ian Tim&aelig;us and Tom Moultrie.
+*Excel* sheets, *Stata* do files and other resources related to the 2020 article in *Demography* [Pathways to Low Fertility: 50 Years of Limitation, Curtailment, and Postponement of Childbearing](https://doi.org/10.1007/s13524-019-00848-5) by Ian Tim&aelig;us and Tom Moultrie.
 
 ## The dataspace
 
@@ -7,7 +7,7 @@ The project makes use of DHS, WFS, and RHS data, all of which contain full birth
 
 ## Running the model
 
-The model is built off the results of two separate statistical regression models. The first examines parity progression by age, duration, parity and time; the second examines entry into motherhood - that is, the risk of a first birth. Outputs from both regression models are used to develop an age-duration-parity-time model of fertility as outlined in [Timæus and Moultrie (2013)](http://dx.doi.org/10.1017/S0021932012000648).
+The model is built off the results of two separate statistical regression models. The first examines parity progression by age, duration, parity and time; the second examines entry into motherhood - that is, the risk of a first birth. Outputs from both regression models are used to develop an age-duration-parity-time model of fertility as outlined in [Timæus and Moultrie (2013)](httsp://doi.org/10.1017/S0021932012000648).
 
 ### 1. Getting started
 
