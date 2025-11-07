@@ -3,7 +3,7 @@
 
 ## The dataspace
 
-The project makes use of DHS, WFS, and RHS data, all of which contain full birth history data allowing the segmentation into fine lexis spaces of women's family formation processes. A listing of the data sets used is contained in *DataInventory.xlsx*. All publicly-accessible data from the 3 programmes are used, barring data from 9 WFS for countries in which no subsequent survey is available; and 2 DHS files (from Senegal) where data in the excluded files are duplicated in other files from the continuous DHS.
+The project makes use of DHS, WFS, and RHS data, all of which contain full birth history data allowing the segmentation into fine lexis spaces of women's family formation processes. A listing of the data sets used is contained in *DataInventory.xlsx*. All the publicly-accessible data from the 3 programmes that were available by early 2019 are used, barring data from 9 WFS for countries in which no subsequent survey is available; and 2 DHS files (from Senegal) where data in the excluded files are duplicated in other files from the continuous DHS.
 
 ## Running the model
 
